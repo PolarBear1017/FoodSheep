@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi-clipboard-check"></i> 我的訂單</h2>
+        <a href="{{ url_for('index') }}" class="btn btn-outline-dark">
+            <i class="bi-house-door"></i> 回首頁
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            
+            {% for order in orders %}
+            <div class="card mb-4 shadow-sm border-0">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                    <div>
+                        <h5 class="mb-0 fw-bold">
+                            <i class="bi-shop"></i> 
+                            {{ merchant_map[order.merchant_id].user_name if order.merchant_id in merchant_map else '未知商家' }}
+                        </h5>
+                        <small class="text-muted">訂單編號 #{{ order.order_id }} • {{ order.order_time.strftime('%Y-%m-%d %H:%M') }}</small>
+                    </div>
+                    
+                    <div>
+                        {% if order.order_status == 'pending' %}
+                            <span class="badge bg-secondary rounded-pill px-3 py-2">未接單 <i class="bi-hourglass"></i></span>
+                        {% elif order.order_status == 'accepted' or order.order_status == 'cooking' %}
+                            <span class="badge bg-warning text-dark rounded-pill px-3 py-2">已接單（製作中） <i class="bi-fire"></i></span>
+                        {% elif order.order_status == 'rejected' %}
+                            <span class="badge bg-info text-dark rounded-pill px-3 py-2">已拒絕 </span>
+                        {% elif order.order_status == 'completed' %}
+                            <span class="badge bg-success rounded-pill px-3 py-2">已完成並送達 <i class="bi-check-lg"></i></span>
+                        {% elif order.order_status == 'cancelled' %}
+                            <span class="badge bg-danger rounded-pill px-3 py-2">已取消 <i class="bi-x-lg"></i></span>
+                        {% else %}
+                            <span class="badge bg-light text-dark border">{{ order.order_status }}</span>
+                        {% endif %}
+                    </div>
+                    
+                </div>
+
+                <div class="card-body">
+                    <ul class="list-group list-group-flush mb-3">
+                        {% for item in order.order_cart %}
+                            {% set food = food_map.get(item[0]) %}
+                            {% if food %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ food.food_image if food.food_image else 'https://dummyimage.com/64x64/dee2e6/6c757d.jpg' }}" 
+                                         class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                    <div>
+                                        <h6 class="mb-0">{{ food.food_name }}</h6>
+                                        <small class="text-muted">${{ food.food_price }} x {{ item[1] }}</small>
+                                    </div>
+                                </div>
+                                <span>${{ food.food_price * item[1] }}</span>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                    
+                    <div class="d-flex justify-content-between align-items-center border-top pt-3">
+                        <div>
+                            <h4 class="fw-bold text-dark d-inline me-3">總計: ${{ order.total_price }}</h4>
+                            <small class="text-muted">外送費已包含</small>
+                        </div>
+
+                        <div>
+                            {% if order.order_status == 'pending' %}
+                                <a href="{{ url_for('customer_cancel_order', order_id=order.order_id) }}" 
+                                class="btn btn-outline-danger btn-sm"
+                                onclick="return confirm('確定要取消這筆訂單嗎？');">
+                                    取消訂單
+                                </a>
+                            
+                            {% elif order.order_status == 'completed' %}
+                                
+                                {% if order.order_id in reviewed_order_ids %}
+                                    <button class="btn btn-secondary btn-sm" disabled>
+                                        <i class="bi-check-circle-fill"></i> 已評論
+                                    </button>
+                                {% else %}
+                                    <a href="{{ url_for('add_review', order_id=order.order_id) }}" 
+                                    class="btn btn-outline-warning text-dark btn-sm">
+                                        <i class="bi-star"></i> 去評論
+                                    </a>
+                                {% endif %}
+
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="bi-clipboard-x display-1 text-muted"></i>
+                <h3 class="mt-3">目前沒有歷史訂單</h3>
+                <p class="text-muted">肚子餓了嗎？快去點餐吧！</p>
+                <a href="{{ url_for('index') }}" class="btn btn-primary mt-2">去逛逛</a>
+            </div>
+            {% endfor %}
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

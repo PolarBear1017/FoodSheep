@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi-clipboard-data" style="color: #fd7e14;"></i> 訂單管理</h2>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            {% if orders %}
+                {% for order in orders %}
+                <div class="card mb-3 shadow-sm {{ 'border-warning' if order.order_status == 'pending' else '' }}">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>訂單 #{{ order.order_id }}</strong>
+                            <span class="text-muted mx-2">|</span>
+                            <i class="bi-person-circle"></i> {{ customer_map[order.customer_id].user_name }}
+                            <span class="text-muted small">({{ order.order_time.strftime('%Y-%m-%d %H:%M') }})</span>
+                        </div>
+                        
+                        <div>
+                            {% if order.order_status == 'pending' %}
+                                <span class="badge bg-warning text-dark">等待接單</span>
+                            {% elif order.order_status == 'accepted' %}
+                                <span class="badge" style="background-color: #fd7e14;">製作中</span>
+                            {% elif order.order_status == 'completed' %}
+                                <span class="badge bg-success">已完成</span>
+                            {% elif order.order_status == 'rejected' %}
+                                <span class="badge bg-danger">已拒絕</span>
+                            {% elif order.order_status == 'cancelled' %}
+                                <span class="badge bg-secondary">顧客已取消</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush mb-3">
+                            {% for item in order.order_cart %}
+                                {% set food = food_map.get(item[0]) %}
+                                {% if food %}
+                                <li class="list-group-item d-flex justify-content-between px-0 py-1 border-0">
+                                    <span>{{ food.food_name }} x <strong>{{ item[1] }}</strong></span>
+                                    <span>${{ food.food_price * item[1] }}</span>
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                        <div class="d-flex justify-content-between align-items-center border-top pt-2">
+                            <h5 class="fw-bold">總計: ${{ order.total_price }}</h5>
+                            
+                            <div>
+                                {% if order.order_status == 'pending' %}
+                                    <a href="{{ url_for('merchant_order_action', order_id=order.order_id, action='accept') }}" 
+                                       class="btn text-white btn-sm"
+                                       style="background-color: #fd7e14; border-color: #fd7e14;">
+                                        <i class="bi-check-lg"></i> 接單
+                                    </a>
+                                    <a href="{{ url_for('merchant_order_action', order_id=order.order_id, action='reject') }}" class="btn btn-outline-danger btn-sm" onclick="return confirm('確定要拒絕這筆訂單嗎？');">
+                                        <i class="bi-x-lg"></i> 拒絕
+                                    </a>
+                                {% elif order.order_status == 'accepted' %}
+                                    <a href="{{ url_for('merchant_order_action', order_id=order.order_id, action='complete') }}" 
+                                       class="btn text-white btn-sm"
+                                       style="background-color: #fd7e14; border-color: #fd7e14;">
+                                        <i class="bi-bicycle"></i> 完成訂單 / 配送
+                                    </a>
+                                {% else %}
+                                    <button class="btn btn-secondary btn-sm" disabled>已結案</button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-info text-center p-5">
+                    <h4>目前沒有任何訂單 📭</h4>
+                    <p>別擔心，美食總會有人欣賞的！</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

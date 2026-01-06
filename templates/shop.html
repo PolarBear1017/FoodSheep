@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="bg-light py-5">
+    <div class="container px-4 px-lg-5">
+        <div class="text-center">
+            <h1 class="display-5 fw-bolder">{{ merchant.user_name }}</h1>
+            <p class="lead fw-normal text-muted mb-2">
+                <i class="bi-geo-alt"></i> {{ merchant.user_position }}
+            </p>
+            
+            <div class="mt-3 text-center">
+                {% if avg_rating > 0 %}
+                    <div class="d-flex justify-content-center align-items-center">
+                        <h1 class="fw-bolder mb-0 me-3 display-4" style="color: #fd7e14;">{{ avg_rating }}</h1>
+                        
+                        <div>
+                            <div class="fs-4" style="color: #fd7e14;">
+                                {% for i in range(avg_rating|int) %}
+                                    <i class="bi-star-fill"></i>
+                                {% endfor %}
+
+                                {% if avg_rating - avg_rating|int >= 0.5 %}
+                                    <i class="bi-star-half"></i>
+                                {% endif %}
+
+                                {% set empty_stars = 5 - (avg_rating|int) - (1 if avg_rating - avg_rating|int >= 0.5 else 0) %}
+                                {% for i in range(empty_stars) %}
+                                    <i class="bi-star"></i>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="text-muted small mt-1">
+                                ({{ reviews|length }} 則評論)
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="d-flex justify-content-center align-items-center">
+                        <h1 class="fw-bolder mb-0 me-3 display-4" style="color: #fd7e14;">0.0</h1>
+                        <div>
+                            <div class="fs-4" style="color: #fd7e14;">
+                                {% for i in range(5) %}
+                                    <i class="bi-star"></i>
+                                {% endfor %}
+                            </div>
+                            <div class="text-muted small mt-1">
+                                (尚無評論)
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="py-5 border-bottom">
+    <div class="container px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+            
+            {% for food in foods %}
+            <div class="col mb-5">
+                <div class="card h-100 shadow-sm" style="border: 1px solid #fd7e14;">
+                    <img src="{{ food.food_image if food.food_image else 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg' }}" 
+                         class="card-img-top" alt="{{ food.food_name }}" style="height: 200px; object-fit: cover;">
+                    
+                    <div class="card-body p-4">
+                        <div class="text-center">
+                            <h5 class="fw-bolder">{{ food.food_name }}</h5>
+                            <div class="fs-5 mb-2 fw-bold" style="color: #fd7e14;">${{ food.food_price }}</div>
+                            <p class="text-muted small">
+                                {{ food.food_description[:30] }}{% if food.food_description|length > 30 %}...{% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                        {% if session.get('user_identity') == 'merchant' %}
+                            <div class="text-center">
+                                <button class="btn btn-secondary w-100" disabled>
+                                    <i class="bi-shop"></i> 商家無法購買
+                                </button>
+                            </div>
+                        {% else %}
+                            <form action="{{ url_for('add_to_cart') }}" method="POST">
+                                <input type="hidden" name="food_id" value="{{ food.food_id }}">
+                                <div class="row g-2 align-items-center">
+                                    <div class="col-4">
+                                        <input type="number" name="quantity" class="form-control text-center px-1" value="1" min="1">
+                                    </div>
+                                    <div class="col-8">
+                                        <button type="submit" class="btn w-100"
+                                                style="color: #fd7e14; border-color: #fd7e14;"
+                                                onmouseover="this.style.backgroundColor='#fd7e14'; this.style.color='white';"
+                                                onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fd7e14';">
+                                            <i class="bi-cart-plus"></i> 加入
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12 text-center">
+                <div class="alert alert-warning">這間餐廳目前還沒有上架餐點喔！</div>
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-white">
+    <div class="container px-4 px-lg-5">
+        <h3 class="mb-4"><i class="bi-chat-right-quote"></i> 顧客評論</h3>
+        
+        <div class="row">
+            <div class="col-lg-8">
+                {% if reviews %}
+                    {% for review in reviews %}
+                    <div class="card mb-3 border-0 shadow-sm bg-light">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="fw-bold mb-0">
+                                    {{ user_map[review.customer_id].user_name }}
+                                </h6>
+                                <small class="text-muted">{{ review.created_at.strftime('%Y-%m-%d') }}</small>
+                            </div>
+                            
+                            <div class="mb-2" style="color: #fd7e14;">
+                                {% for i in range(review.rating) %}
+                                    <i class="bi-star-fill"></i>
+                                {% endfor %}
+                                {% for i in range(5 - review.rating) %}
+                                    <i class="bi-star"></i>
+                                {% endfor %}
+                            </div>
+                            
+                            <p class="mb-0">{{ review.content }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-muted py-3">
+                        <p>目前還沒有評論，快來點餐並分享您的心得吧！</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

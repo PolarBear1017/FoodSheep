@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            
+            <div class="text-center mb-5">
+                <h2 class="fw-bold display-5">FoodSheep <span class="text-warning">VIP</span></h2>
+                <p class="text-muted lead">升級會員，享受尊榮級的美食體驗</p>
+            </div>
+
+            <div class="card shadow-lg border-0 overflow-hidden text-white" style="border-radius: 20px; background: linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 100%);">
+                <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(255, 193, 7, 0.1); border-radius: 50%;"></div>
+                
+                <div class="card-body p-5 text-center">
+                    <div class="mb-4">
+                        <i class="bi bi-crown-fill text-warning" style="font-size: 4rem;"></i>
+                    </div>
+                    
+                    <h3 class="card-title fw-bold mb-0">尊榮月卡方案</h3>
+                    <div class="display-3 fw-bold my-3 text-warning">
+                        $300 <span class="fs-5 text-white fw-normal">/ 月</span>
+                    </div>
+                    <p class="text-white-50 mb-4">隨時取消，享受無負擔的美味</p>
+
+                    <div class="text-start bg-white bg-opacity-10 p-4 rounded-3 mb-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="bi bi-check-circle-fill text-warning me-3 fs-4"></i>
+                            <div>
+                                <h5 class="mb-0 fw-bold">無限次免外送費</h5>
+                                <small class="text-white-50">每筆訂單外送費自動歸零</small>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-percent text-warning me-3 fs-4"></i>
+                            <div>
+                                <h5 class="mb-0 fw-bold">滿額專屬折扣</h5>
+                                <small class="text-white-50">單筆滿 $1000 享 95 折優惠</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form action="{{ url_for('process_upgrade') }}" method="POST">
+                        {% if current_user.is_vip %}
+                            <button type="button" class="btn btn-warning btn-lg w-100 fw-bold text-dark disabled">
+                                <i class="bi bi-check-lg"></i> 您目前已是會員
+                            </button>
+                            <div class="mt-2 small text-warning">
+                                到期日：{{ current_user.vip_expire_time.strftime('%Y-%m-%d') }}
+                            </div>
+                        {% else %}
+                            <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold text-dark shadow-sm"
+                                    onclick="return confirm('確定要支付 $300 升級為會員嗎？');">
+                                立即升級 <i class="bi bi-arrow-right"></i>
+                            </button>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{{ url_for('index') }}" class="text-muted text-decoration-none">
+                    <i class="bi bi-arrow-left"></i> 返回首頁
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

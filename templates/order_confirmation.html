@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="text-center mb-5">
+        <div class="mb-3">
+            <i class="bi-check-circle-fill" style="font-size: 4rem; color: #fd7e14;"></i>
+        </div>
+        <h2 class="fw-bold">訂單已送出！</h2>
+        <p class="text-muted">商家已收到您的訂單，正準備為您製作美食。</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h5 class="mb-3 text-muted">本次訂單明細</h5>
+            
+            {% for order in orders %}
+            <div class="card mb-4 shadow border-0">
+                <div class="card-header text-white d-flex justify-content-between align-items-center"
+                     style="background-color: #fd7e14;">
+                    <span>
+                        <i class="bi-shop"></i> 
+                        {{ merchant_map[order.merchant_id].user_name }}
+                    </span>
+                    <div>
+                        {% if order.order_status == 'pending' %}
+                            <span class="badge bg-secondary">未接單 <i class="bi-hourglass"></i></span>
+                        {% elif order.order_status == 'accepted' or order.order_status == 'cooking' %}
+                            <span class="badge bg-warning text-dark">已接單（製作中） <i class="bi-fire"></i></span>
+                        {% elif order.order_status == 'delivering' %}
+                            <span class="badge bg-info text-dark">外送中 <i class="bi-bicycle"></i></span>
+                        {% elif order.order_status == 'completed' %}
+                            <span class="badge bg-success">已完成並送達 <i class="bi-check-lg"></i></span>
+                        {% elif order.order_status == 'cancelled' %}
+                            <span class="badge bg-danger">已取消 <i class="bi-x-lg"></i></span>
+                        {% else %}
+                            <span class="badge bg-light text-dark border">{{ order.order_status }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush mb-3">
+                        {% for item in order.order_cart %}
+                            {% set food = food_map.get(item[0]) %}
+                            {% if food %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ food.food_image if food.food_image else 'https://dummyimage.com/64x64/dee2e6/6c757d.jpg' }}" 
+                                         class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                    <div>
+                                        <h6 class="mb-0">{{ food.food_name }}</h6>
+                                        <small class="text-muted">x {{ item[1] }}</small>
+                                    </div>
+                                </div>
+                                <span>${{ food.food_price * item[1] }}</span>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                    
+                    <div class="d-flex justify-content-between align-items-center border-top pt-3">
+                        <small class="text-muted">訂單編號 #{{ order.order_id }}</small>
+                        <h4 class="fw-bold">總計: ${{ order.total_price }}</h4>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="d-grid gap-2 d-md-flex justify-content-center mt-5">
+                <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-lg px-4">
+                    <i class="bi-house"></i> 回首頁
+                </a>
+                <a href="{{ url_for('my_orders') }}" class="btn btn-lg px-4 text-white" 
+                   style="background-color: #fd7e14; border-color: #fd7e14;">
+                    查看所有歷史訂單 <i class="bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

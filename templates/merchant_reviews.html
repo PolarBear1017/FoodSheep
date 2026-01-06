@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center py-4">
+                    <h3 class="mb-3">顧客評價總覽</h3>
+                    
+                    <div class="fs-5" style="color: #fd7e14;">
+                        {% if avg_rating > 0 %}
+                            <span class="fw-bold display-4">{{ avg_rating }}</span> 
+                            <i class="bi-star-fill fs-4"></i>
+                            <div class="mt-2 text-muted fs-6">
+                                (共 {{ reviews|length }} 則評論)
+                            </div>
+                        {% else %}
+                            <small class="text-muted fs-6">尚無評分</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <h5 class="mb-3 text-muted border-start border-4 ps-2" style="border-color: #fd7e14 !important;">詳細評論列表</h5>
+
+            {% if reviews %}
+                {% for review in reviews %}
+                <div class="card mb-3 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                                    <i class="bi-person-fill text-secondary"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">
+                                        {{ customer_map[review.customer_id].user_name if customer_map.get(review.customer_id) else '未知顧客' }}
+                                    </h6>
+                                    <small class="text-muted" style="font-size: 0.8rem;">
+                                        {{ review.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                    </small>
+                                </div>
+                            </div>
+                            
+                            <div style="color: #fd7e14;">
+                                {% for i in range(review.rating) %}
+                                    <i class="bi-star-fill"></i>
+                                {% endfor %}
+                                {% for i in range(5 - review.rating) %}
+                                    <i class="bi-star"></i>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <p class="card-text bg-light p-3 rounded">
+                            {{ review.content }}
+                        </p>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-info text-center" role="alert">
+                    目前還沒有收到任何評論喔！加油！ 💪
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}

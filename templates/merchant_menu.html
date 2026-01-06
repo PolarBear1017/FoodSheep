@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi-shop" style="color: #fd7e14;"></i> 菜單管理</h2>
+        
+        <div>
+            <a href="{{ url_for('add_food') }}" class="btn text-white" style="background-color: #fd7e14; border-color: #fd7e14;">
+                <i class="bi-plus-circle"></i> 上架新商品
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for food in foods %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm"  style="border: 1px solid #fd7e14;">
+                <img src="{{ food.food_image if food.food_image else 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg' }}" class="card-img-top" alt="..." style="height: 200px; object-fit: cover;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ food.food_name }}</h5>
+                    <p class="card-text text-muted">{{ food.food_description }}</p>
+                    <h6 class="fw-bold" style="color: #fd7e14;">${{ food.food_price }}</h6>
+                </div>
+                <div class="card-footer bg-transparent border-top-0 d-flex gap-2">
+                    <a href="{{ url_for('edit_food', food_id=food.food_id) }}" 
+                       class="btn w-50"
+                       style="color: #fd7e14; border-color: #fd7e14;"
+                       onmouseover="this.style.backgroundColor='#fd7e14'; this.style.color='white';"
+                       onmouseout="this.style.backgroundColor='transparent'; this.style.color='#fd7e14';">
+                        <i class="bi-pencil-square"></i> 編輯
+                    </a>
+                    
+                    <a href="{{ url_for('delete_food', food_id=food.food_id) }}" 
+                    class="btn btn-outline-danger w-50"
+                    onclick="return confirm('確定要下架「{{ food.food_name }}」嗎？此動作無法復原！');">
+                        <i class="bi-trash"></i> 下架
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12 text-center py-5">
+            <div class="text-muted">
+                <h4>您還沒有上架任何商品 🍜</h4>
+                <p>點擊右上角的按鈕來新增您的第一道美食吧！</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

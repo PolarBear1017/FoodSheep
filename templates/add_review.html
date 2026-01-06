@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<style>
+    /* 1. 隱藏原本的圓點單選鈕 */
+    .star-rating input {
+        display: none;
+    }
+
+    /* 2. 設定容器：反向排列 */
+    .star-rating {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    /* 3. 星星基本設定 (設定大小、游標) */
+    .star-rating label {
+        font-size: 3rem;
+        cursor: pointer;
+        color: #ddd; /* 預設灰色 */
+        transition: color 0.2s;
+    }
+
+    /* --- 核心邏輯：控制兩個圖示的切換 --- */
+
+    /* A. 預設狀態：顯示空心星星，隱藏實心星星 */
+    .star-rating label .bi-star { display: inline-block; }
+    .star-rating label .bi-star-fill { display: none; }
+
+    /* B. 互動狀態 (滑鼠滑過 Hover 或 被選取 Checked)： */
+    /* 1. 讓星星變橘色 (#fd7e14) - 原本是黃色 */
+    .star-rating input:checked ~ label,
+    .star-rating label:hover,
+    .star-rating label:hover ~ label {
+        color: #fd7e14;
+    }
+
+    /* 2. 把「空心」藏起來 */
+    .star-rating input:checked ~ label .bi-star,
+    .star-rating label:hover .bi-star,
+    .star-rating label:hover ~ label .bi-star {
+        display: none;
+    }
+
+    /* 3. 把「實心」秀出來 */
+    .star-rating input:checked ~ label .bi-star-fill,
+    .star-rating label:hover .bi-star-fill,
+    .star-rating label:hover ~ label .bi-star-fill {
+        display: inline-block;
+    }
+</style>
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow border-0">
+                <div class="card-header text-white border-0" style="background-color: #fd7e14;">
+                    <h4 class="mb-0 fw-bold"><i class="bi-star-fill"></i> 評價您的訂單</h4>
+                </div>
+                
+                <div class="card-body p-5 text-center">
+                    <p class="text-muted mb-4">訂單編號 #{{ order.order_id }}</p>
+                    
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+
+                        <div class="mb-4">
+                            <h5 class="fw-bold mb-3">整體評價</h5>
+                            
+                            <div class="star-rating">
+                                <input type="radio" id="star5" name="rating" value="5" required />
+                                <label for="star5" title="非常滿意">
+                                    <i class="bi bi-star"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                </label>
+                                
+                                <input type="radio" id="star4" name="rating" value="4" />
+                                <label for="star4" title="滿意">
+                                    <i class="bi bi-star"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                </label>
+                                
+                                <input type="radio" id="star3" name="rating" value="3" />
+                                <label for="star3" title="普通">
+                                    <i class="bi bi-star"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                </label>
+                                
+                                <input type="radio" id="star2" name="rating" value="2" />
+                                <label for="star2" title="不滿意">
+                                    <i class="bi bi-star"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                </label>
+                                
+                                <input type="radio" id="star1" name="rating" value="1" />
+                                <label for="star1" title="非常糟糕">
+                                    <i class="bi bi-star"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                </label>
+                            </div>
+                            
+                            <div class="mt-2 fw-bold fs-5" id="rating-text" style="min-height: 1.5rem;">
+                                <span class="text-muted small">請點擊星星</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4 text-start">
+                            <label class="form-label fw-bold">您的心得</label>
+                            {{ form.content(class="form-control bg-light", rows="5", placeholder="餐點口味如何？歡迎分享您的用餐體驗！") }}
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            {{ form.submit(class="btn btn-lg text-white", style="background-color: #fd7e14; border-color: #fd7e14;") }}
+                            <a href="{{ url_for('my_orders') }}" class="btn btn-outline-secondary">取消返回</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const ratingLabels = {
+        '5': '非常滿意',
+        '4': '滿意',
+        '3': '普通',
+        '2': '不滿意',
+        '1': '非常糟糕'
+    };
+    
+    const textDiv = document.getElementById('rating-text');
+    
+    document.querySelectorAll('.star-rating input').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            const val = e.target.value;
+            // JS 動態顯示的文字顏色也改為橘色
+            textDiv.innerHTML = `<span style="color: #fd7e14;">${ratingLabels[val]}</span>`;
+        });
+    });
+</script>
+
+{% endblock %}

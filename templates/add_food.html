@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow border-0">
+                <div class="card-header text-white" style="background-color: #fd7e14;">
+                    <h4 class="mb-0">上架新商品</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+
+                        <div class="mb-3">
+                            {{ form.name.label(class="form-label") }}
+                            {{ form.name(class="form-control", placeholder="例如：招牌牛肉麵") }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.price.label(class="form-label") }}
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                {{ form.price(class="form-control", placeholder="例如：150") }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.description.label(class="form-label") }}
+                            {{ form.description(class="form-control", rows="3", placeholder="介紹一下這道美食...") }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.food_image.label(class="form-label") }}
+                            {{ form.food_image(class="form-control", placeholder="https://example.com/food.jpg") }}
+                            <div class="form-text">您可以從 Google 圖片複製圖片位址貼上。</div>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            {{ form.submit(class="btn btn-lg text-white", style="background-color: #fd7e14; border-color: #fd7e14;") }}
+                            <a href="{{ url_for('merchant_dashboard') }}" class="btn btn-outline-secondary">取消</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block content %}
+<header class="py-5" style="background-color: rgba(253, 126, 20, 0.15);">
+    <div class="container px-4 px-lg-5 my-5">
+        <div class="text-center">
+            <h1 class="display-4 fw-bolder text-dark">FoodSheep 🐑</h1>
+            <p class="lead fw-normal text-muted mb-0">發現您身邊的美食</p>
+        </div>
+    </div>
+</header>
+
+<section class="py-5">
+    <div class="container px-4 px-lg-5">
+        
+        <div class="d-flex justify-content-end align-items-center mb-4">
+            <div class="dropdown">
+                <button class="btn dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false"
+                        style="border-color: #fd7e14; color: #fd7e14;">
+                    <i class="bi-funnel"></i> 排序：
+                    {% if current_sort == 'desc' %}
+                        評分高 <i class="bi-arrow-right"></i> 低
+                    {% elif current_sort == 'asc' %}
+                        評分低 <i class="bi-arrow-right"></i> 高
+                    {% else %}
+                        預設推薦
+                    {% endif %}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sortDropdown">
+                    <li>
+                        <a class="dropdown-item {{ 'active' if not current_sort else '' }}" href="{{ url_for('index') }}">
+                            預設推薦
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item {{ 'active' if current_sort == 'desc' else '' }}" href="{{ url_for('index', sort='desc') }}">
+                            <i class="bi-sort-down"></i> 評分高 <i class="bi-arrow-right"></i> 低
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item {{ 'active' if current_sort == 'asc' else '' }}" href="{{ url_for('index', sort='asc') }}">
+                            <i class="bi-sort-up"></i> 評分低 <i class="bi-arrow-right"></i> 高
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center" >
+            
+            {% for merchant in merchants %}
+            <div class="col mb-5" >
+                <div class="card h-100 shadow-sm" style="border: 1px solid #fd7e14;">
+                    <img class="card-img-top" 
+                         src="{{ merchant.image if merchant.image else 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg' }}" 
+                         alt="..." 
+                         style="height: 200px; object-fit: cover;" />
+                    
+                    <div class="card-body p-4">
+                        <div class="text-center">
+                            <h5 class="fw-bolder">{{ merchant.name }}</h5>
+                            
+                            <div class="d-flex justify-content-center align-items-center mb-2" style="color: #fd7e14;">
+                                {% if merchant.review_count > 0 %}
+                                    <span class="fw-bold fs-5">{{ merchant.rating }}</span>
+                                    <i class="bi-star-fill ms-1"></i>
+                                    <span class="text-muted small ms-2">({{ merchant.review_count }})</span>
+                                {% else %}
+                                    <span class="fw-bold fs-5">0.0</span>
+                                    <i class="bi-star-fill ms-1"></i>
+                                    <span class="text-muted small ms-2">(0)</span>
+                                {% endif %}
+                            </div>
+
+                            <p class="text-muted small mb-0"><i class="bi-geo-alt"></i> {{ merchant.address }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                        <div class="text-center">
+                            <a class="btn mt-auto text-white" 
+                               href="{{ url_for('merchant_shop', merchant_id=merchant.id) }}"
+                               style="background-color: #fd7e14; border-color: #fd7e14;">
+                                查看菜單
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12 text-center">
+                <p class="text-muted">目前沒有任何商家進駐。</p>
+            </div>
+            {% endfor %}
+            
+        </div>
+    </div>
+</section>
+{% endblock %}

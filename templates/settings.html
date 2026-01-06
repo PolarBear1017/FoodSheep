@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header text-white" style="background-color: #fd7e14;">
+                    <h4 class="mb-0"><i class="bi-gear-fill me-2"></i>個人資料設定</h4>
+                </div>
+                
+                <div class="card-body p-4">
+                    
+                    <div class="alert alert-light border mb-4">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <small class="text-muted fw-bold">身分</small>
+                                <div>
+                                    {% if user.user_identity == 'merchant' %}
+                                        <span class="badge bg-dark">商家老闆</span>
+
+                                    {% elif user.is_vip %}
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="bi bi-crown-fill"></i> 尊榮會員
+                                        </span>
+                                        
+                                        {% if user.vip_expire_time %}
+                                            <span class="text-muted ms-2 small">
+                                                <i class="bi bi-clock"></i> 會員效期至：{{ user.vip_expire_time.strftime('%Y-%m-%d') }}
+                                            </span>
+                                        {% endif %}
+
+                                    {% else %}
+                                        <span class="badge bg-secondary">一般會員</span>
+                                        
+                                        <a href="{{ url_for('upgrade_page') }}" class="text-decoration-none ms-2 small fw-bold" style="color: #fd7e14;">
+                                            去升級 <i class="bi bi-arrow-right"></i>
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            {% if user.user_identity == 'merchant' %}
+                            <div class="col-6">
+                                <small class="text-muted fw-bold">目前評分</small>
+                                <div class="fw-bold" style="color: #fd7e14;">
+                                    {{ rating }}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <div class="col-12 mt-2">
+                                <small class="text-muted fw-bold">電子郵件 (帳號)</small>
+                                <div class="text-dark fw-bold">{{ user.user_email }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+
+                        <div class="mb-3">
+                            {{ form.name.label(class="form-label") }}
+                            {{ form.name(class="form-control") }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.contact.label(class="form-label") }}
+                            {{ form.contact(class="form-control") }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.address.label(class="form-label") }}
+                            {{ form.address(class="form-control") }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.new_password.label(class="form-label") }}
+                            {{ form.new_password(class="form-control", placeholder="******") }}
+                            <div class="form-text">如不需修改密碼，請保持空白。</div>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            {{ form.submit(class="btn btn-lg text-white", style="background-color: #fd7e14; border-color: #fd7e14;") }}
+                            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">取消</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
