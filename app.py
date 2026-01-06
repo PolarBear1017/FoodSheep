@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv  # 引入這行 (需要 pip install python-dotenv)
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import ARRAY
@@ -12,16 +13,18 @@ from wtforms.validators import Optional
 from functools import wraps
 DELIVERY_FEE = 30
 
+# 載入 .env 檔案 (這讓你在本機也能讀到環境變數)
+load_dotenv()
 
 app = Flask(__name__)
 
 # 2. 修改 SECRET_KEY 設定：優先讀取環境變數，讀不到才用預設值
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', '77ZPX8yHxujYpXz6aZkyAKm2kDCGt2zt')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev_secret_key')
 
 # 3. 修改資料庫設定 (最重要的一步！)
 # 這樣寫的意思是：如果 Render 有設定 'DATABASE_URL' 就用 Render 的(內網)，
-# 如果沒有(例如你在自己電腦跑)，就用後面那串外部連線網址。
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'postgresql://foodsheep_database_user:77ZPX8yHxujYpXz6aZkyAKm2kDCGt2zt@dpg-d5b6evv5r7bs73a6h0ng-a.virginia-postgres.render.com/foodsheep_database')
+# 如果本機 .env 有設定，它就會讀到；如果 Render 有設定，它也會讀到。
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 

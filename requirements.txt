@@ -6,3 +6,4 @@ gunicorn
 email-validator
 Werkzeug
 wtforms
+python-dotenv
